@@ -14,10 +14,10 @@ namespace TenderManagementApi.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "vendor")]
     public class AuthController(IAuthService authService) : ControllerBase
     {
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<ActionResult<ApiResponse<RegisterResponse>>> Register([FromBody] RegisterDto model)
         {
             var response = new ApiResponse<RegisterResponse>();
@@ -45,6 +45,7 @@ namespace TenderManagementApi.Controllers
         }
 
         [HttpPost("login")]
+        [Authorize(Roles = "vendor")]
         public async Task<ActionResult<ApiResponse<LoginResponse>>> Login([FromBody] LoginDto model)
         {
             var response = new ApiResponse<LoginResponse>();
