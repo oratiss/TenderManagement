@@ -1,0 +1,6 @@
+@TenderManagementApi_HostAddress = http://localhost:5124
+
+GET {{TenderManagementApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
