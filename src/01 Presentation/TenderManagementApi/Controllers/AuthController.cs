@@ -45,7 +45,7 @@ namespace TenderManagementApi.Controllers
         }
 
         [HttpPost("login")]
-        [Authorize(Roles = "vendor")]
+        [AllowAnonymous]
         public async Task<ActionResult<ApiResponse<LoginResponse>>> Login([FromBody] LoginDto model)
         {
             var response = new ApiResponse<LoginResponse>();
