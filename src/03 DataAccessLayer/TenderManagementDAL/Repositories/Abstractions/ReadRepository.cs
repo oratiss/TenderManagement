@@ -3,34 +3,31 @@ using Dapper;
 
 namespace TenderManagementDAL.Repositories.Abstractions
 {
-    public abstract class ReadRepository<TEntity, TId>(IDbConnection connection) : IReadRepository<TEntity, TId>
+    public abstract class ReadRepository<TEntity, TId>(IDbConnection connection, string tableName) : IReadRepository<TEntity, TId>
         where TEntity : class, IEntity<TId>
     {
-        protected readonly IDbConnection Connection = connection;
-
-        protected abstract string TableName { get; }
 
         public TEntity? GetById(TId id)
         {
-            var sql = $"SELECT * FROM {TableName} WHERE Id = @Id";
-            return Connection.QuerySingleOrDefault<TEntity>(sql, new { Id = id });
+            var sql = $"SELECT * FROM {tableName} WHERE Id = @Id";
+            return connection.QuerySingleOrDefault<TEntity>(sql, new { Id = id });
         }
 
         public Task<TEntity?> GetByIdAsync(TId id)
         {
-            var sql = $"SELECT * FROM {TableName} WHERE Id = @Id";
-            return Connection.QuerySingleOrDefaultAsync<TEntity>(sql, new { Id = id });
+            var sql = $"SELECT * FROM {tableName} WHERE Id = @Id";
+            return connection.QuerySingleOrDefaultAsync<TEntity>(sql, new { Id = id });
         }
 
         public (IEnumerable<TEntity>?, long) GetAll(string orderBy = "Id", SortOrder sortOrder = SortOrder.Asc)
         {
             var order = sortOrder == SortOrder.Asc ? "ASC" : "DESC";
             var sql = $"""
-                       SELECT * FROM {TableName} ORDER BY {orderBy} {order};
-                       SELECT COUNT(*) FROM {TableName};
+                       SELECT * FROM {tableName} ORDER BY {orderBy} {order};
+                       SELECT COUNT(*) FROM {tableName};
                        """;
 
-            using var multi = Connection.QueryMultiple(sql);
+            using var multi = connection.QueryMultiple(sql);
             var data = multi.Read<TEntity>();
             var count = multi.ReadSingle<long>();
             return (data, count);
@@ -41,11 +38,11 @@ namespace TenderManagementDAL.Repositories.Abstractions
             var (whereClause, parameters) = BuildWhereClause(filters);
             var order = sortOrder == SortOrder.Asc ? "ASC" : "DESC";
             var sql = $"""
-                   SELECT * FROM {TableName} {whereClause} ORDER BY {orderBy} {order};
-                   SELECT COUNT(*) FROM {TableName} {whereClause};
+                   SELECT * FROM {tableName} {whereClause} ORDER BY {orderBy} {order};
+                   SELECT COUNT(*) FROM {tableName} {whereClause};
                    """;
 
-            using var multi = Connection.QueryMultiple(sql, parameters);
+            using var multi = connection.QueryMultiple(sql, parameters);
             var data = multi.Read<TEntity>();
             var count = multi.ReadSingle<long>();
             return (data, count);
@@ -58,11 +55,11 @@ namespace TenderManagementDAL.Repositories.Abstractions
         {
             var order = sortOrder == SortOrder.Asc ? "ASC" : "DESC";
             var sql = $"""
-                   SELECT * FROM {TableName} ORDER BY {orderBy} {order};
-                   SELECT COUNT(*) FROM {TableName};
+                   SELECT * FROM {tableName} ORDER BY {orderBy} {order};
+                   SELECT COUNT(*) FROM {tableName};
                    """;
 
-            await using var multi = await Connection.QueryMultipleAsync(sql);
+            await using var multi = await connection.QueryMultipleAsync(sql);
             var data = await multi.ReadAsync<TEntity>();
             var count = await multi.ReadSingleAsync<long>();
             return (data, count);
@@ -78,14 +75,14 @@ namespace TenderManagementDAL.Repositories.Abstractions
             parameters.Add("PageSize", pageSize);
 
             var sql = $"""
-                       SELECT * FROM {TableName}
+                       SELECT * FROM {tableName}
                        ORDER BY {orderBy} {order}
                        OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
-                       SELECT COUNT(*) FROM {TableName};
+                       SELECT COUNT(*) FROM {tableName};
                        """;
 
-            using var multi = Connection.QueryMultiple(sql, parameters);
+            using var multi = connection.QueryMultiple(sql, parameters);
             var data = multi.Read<TEntity>();
             var count = multi.ReadSingle<long>();
             return (data, count);
@@ -101,15 +98,15 @@ namespace TenderManagementDAL.Repositories.Abstractions
             parameters.Add("PageSize", pageSize);
 
             var sql = $"""
-                   SELECT * FROM {TableName}
+                   SELECT * FROM {tableName}
                    {whereClause}
                    ORDER BY {orderBy} {order}
                    OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
-                   SELECT COUNT(*) FROM {TableName} {whereClause};
+                   SELECT COUNT(*) FROM {tableName} {whereClause};
                    """;
 
-            using var multi = Connection.QueryMultiple(sql, parameters);
+            using var multi = connection.QueryMultiple(sql, parameters);
             var data = multi.Read<TEntity>();
             var count = multi.ReadSingle<long>();
             return (data, count);
@@ -125,14 +122,14 @@ namespace TenderManagementDAL.Repositories.Abstractions
             parameters.Add("PageSize", pageSize);
 
             var sql = $"""
-                       SELECT * FROM {TableName}
+                       SELECT * FROM {tableName}
                        ORDER BY {orderBy} {order}
                        OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
-                       SELECT COUNT(*) FROM {TableName};
+                       SELECT COUNT(*) FROM {tableName};
                        """;
 
-            await using var multi = await Connection.QueryMultipleAsync(sql, parameters);
+            await using var multi = await connection.QueryMultipleAsync(sql, parameters);
             var data = await multi.ReadAsync<TEntity>();
             var count = await multi.ReadSingleAsync<long>();
             return (data, count);
@@ -148,15 +145,15 @@ namespace TenderManagementDAL.Repositories.Abstractions
             parameters.Add("PageSize", pageSize);
 
             var sql = $"""
-                   SELECT * FROM {TableName}
+                   SELECT * FROM {tableName}
                    {whereClause}
                    ORDER BY {orderBy} {order}
                    OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;
 
-                   SELECT COUNT(*) FROM {TableName} {whereClause};
+                   SELECT COUNT(*) FROM {tableName} {whereClause};
                    """;
 
-            await using var multi = await Connection.QueryMultipleAsync(sql, parameters);
+            await using var multi = await connection.QueryMultipleAsync(sql, parameters);
             var data = await multi.ReadAsync<TEntity>();
             var count = await multi.ReadSingleAsync<long>();
             return (data, count);
@@ -165,43 +162,43 @@ namespace TenderManagementDAL.Repositories.Abstractions
         public TEntity? GetSingleOrDefault(Dictionary<string, object> filters)
         {
             var (whereClause, parameters) = BuildWhereClause(filters);
-            var sql = $"SELECT * FROM {TableName} {whereClause}";
-            return Connection.QuerySingleOrDefault<TEntity>(sql, parameters);
+            var sql = $"SELECT * FROM {tableName} {whereClause}";
+            return connection.QuerySingleOrDefault<TEntity>(sql, parameters);
         }
 
         public Task<TEntity?> GetSingleOrDefaultAsync(Dictionary<string, object> filters)
         {
             var (whereClause, parameters) = BuildWhereClause(filters);
-            var sql = $"SELECT * FROM {TableName} {whereClause}";
-            return Connection.QuerySingleOrDefaultAsync<TEntity>(sql, parameters);
+            var sql = $"SELECT * FROM {tableName} {whereClause}";
+            return connection.QuerySingleOrDefaultAsync<TEntity>(sql, parameters);
         }
 
         public TEntity? GetFirstOrDefault(Dictionary<string, object> filters)
         {
             var (whereClause, parameters) = BuildWhereClause(filters);
-            var sql = $"SELECT TOP 1 * FROM {TableName} {whereClause} ORDER BY Id ASC";
-            return Connection.QueryFirstOrDefault<TEntity>(sql, parameters);
+            var sql = $"SELECT TOP 1 * FROM {tableName} {whereClause} ORDER BY Id ASC";
+            return connection.QueryFirstOrDefault<TEntity>(sql, parameters);
         }
 
         public Task<TEntity?> GetFirstOrDefaultAsync(Dictionary<string, object> filters)
         {
             var (whereClause, parameters) = BuildWhereClause(filters);
-            var sql = $"SELECT TOP 1 * FROM {TableName} {whereClause} ORDER BY Id ASC";
-            return Connection.QueryFirstOrDefaultAsync<TEntity>(sql, parameters);
+            var sql = $"SELECT TOP 1 * FROM {tableName} {whereClause} ORDER BY Id ASC";
+            return connection.QueryFirstOrDefaultAsync<TEntity>(sql, parameters);
         }
 
         public TEntity? GetLastOrDefault(Dictionary<string, object> filters)
         {
             var (whereClause, parameters) = BuildWhereClause(filters);
-            var sql = $"SELECT TOP 1 * FROM {TableName} {whereClause} ORDER BY Id DESC";
-            return Connection.QueryFirstOrDefault<TEntity>(sql, parameters);
+            var sql = $"SELECT TOP 1 * FROM {tableName} {whereClause} ORDER BY Id DESC";
+            return connection.QueryFirstOrDefault<TEntity>(sql, parameters);
         }
 
         public Task<TEntity?> GetLastOrDefaultAsync(Dictionary<string, object> filters)
         {
             var (whereClause, parameters) = BuildWhereClause(filters);
-            var sql = $"SELECT TOP 1 * FROM {TableName} {whereClause} ORDER BY Id DESC";
-            return Connection.QueryFirstOrDefaultAsync<TEntity>(sql, parameters);
+            var sql = $"SELECT TOP 1 * FROM {tableName} {whereClause} ORDER BY Id DESC";
+            return connection.QueryFirstOrDefaultAsync<TEntity>(sql, parameters);
         }
 
         private (string Sql, DynamicParameters Params) BuildWhereClause(Dictionary<string, object>? filters)
@@ -225,6 +222,6 @@ namespace TenderManagementDAL.Repositories.Abstractions
     }
 
 
-    public abstract class ReadRepository<TEntity>(IDbConnection connection) : ReadRepository<TEntity, int>(connection)
+    public abstract class ReadRepository<TEntity>(IDbConnection connection, string tableName) : ReadRepository<TEntity, int>(connection, tableName)
         where TEntity : class, IEntity<int>;
 }

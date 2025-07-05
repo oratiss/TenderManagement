@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using TenderManagementApi.MiddleWares;
 using TenderManagementDAL.Contexts;
 using TenderManagementDAL.Models;
 using TenderManagementDAL.Repositories.Abstractions;
+using TenderManagementDAL.Repositories.ReadRepositories;
 using TenderManagementDAL.UnitOfWorks;
 
 namespace TenderManagementApi.ProgramExtensions
@@ -12,15 +15,15 @@ namespace TenderManagementApi.ProgramExtensions
     {
         public static void AddSqlServer(this IServiceCollection services, string connectionString)
         {
-            services.AddDbContext<TenderManagementDbContext>(options => options.UseSqlServer(connectionString
-                    , sqlOptions =>
-                    {
-                        sqlOptions.EnableRetryOnFailure(
-                            maxRetryCount: 5,
-                            maxRetryDelay: TimeSpan.FromSeconds(15),
-                            errorNumbersToAdd: null);
-                    }
-                    ));
+            services.AddDbContext<TenderManagementDbContext>(options => options.UseSqlServer(connectionString,
+                sqlOptions =>
+                {
+                    sqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(15),
+                        errorNumbersToAdd: null);
+                }
+            ));
             var serviceProvider = services.BuildServiceProvider();
             var dataContext = serviceProvider!.GetService<TenderManagementDbContext>();
 
@@ -31,6 +34,41 @@ namespace TenderManagementApi.ProgramExtensions
         public static void AddUnitOfWorks(this IServiceCollection services)
         {
             services.AddScoped<ITenderManagementUnitOfWork, TenderManagementUnitOfWork>();
+        }
+
+        public static void AddDapperConnectionAndRepos(this IServiceCollection services, string connectionString)
+        {
+            services.AddScoped<IDbConnection>(sp => new SqlConnection(connectionString));
+
+            services.AddScoped<IReadableBidRepository>(sp =>
+            {
+                var connection = sp.GetRequiredService<IDbConnection>();
+                return new ReadableBidRepository(connection, "Bids");
+            });
+
+            services.AddScoped<IReadableCategoryRepository>(sp =>
+            {
+                var connection = sp.GetRequiredService<IDbConnection>();
+                return new ReadableCategoryRepository(connection, "Categories");
+            });
+
+            services.AddScoped<IReadableTenderRepository>(sp =>
+            {
+                var connection = sp.GetRequiredService<IDbConnection>();
+                return new ReadableTenderRepository(connection, "Tenders");
+            });
+
+            services.AddScoped<IReadableVendorRepository>(sp =>
+            {
+                var connection = sp.GetRequiredService<IDbConnection>();
+                return new ReadableVendorRepository(connection, "Vendors");
+            });
+
+            services.AddScoped<IReadableStatusRepository>(sp =>
+            {
+                var connection = sp.GetRequiredService<IDbConnection>();
+                return new ReadableStatusRepository(connection, "Statuses");
+            });
         }
 
         public static IApplicationBuilder UseCustomExceptionHandler(this IApplicationBuilder app) => app.UseMiddleware<GlobalExceptionHandlerMiddleware>();

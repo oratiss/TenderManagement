@@ -1,5 +1,5 @@
 ﻿using TenderManagementDAL.Contexts;
-using TenderManagementDAL.Repositories;
+using TenderManagementDAL.Repositories.WriteRepositories;
 
 namespace TenderManagementDAL.UnitOfWorks
 {

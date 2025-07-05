@@ -1,10 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using System.Data;
 using System.Text;
 using TenderManagementApi.ProgramExtensions;
 using TenderManagementDAL.Contexts;
@@ -35,8 +32,7 @@ builder.Services.AddSqlServer(connectionString);
 builder.Services.AddUnitOfWorks();
 
 //add read sql services
-builder.Services.AddScoped<IDbConnection>(sp =>
-    new SqlConnection(connectionString));
+builder.Services.AddDapperConnectionAndRepos(connectionString);
 
 // Identity + EF
 builder.Services.AddIdentity<User, Role>()
