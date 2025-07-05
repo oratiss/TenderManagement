@@ -1,11 +1,38 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using TenderManagementApi.MiddleWares;
+using TenderManagementDAL.Contexts;
 using TenderManagementDAL.Models;
+using TenderManagementDAL.Repositories.Abstractions;
+using TenderManagementDAL.UnitOfWorks;
 
 namespace TenderManagementApi.ProgramExtensions
 {
     public static class ProgramExtension
     {
+        public static void AddSqlServer(this IServiceCollection services, string connectionString)
+        {
+            services.AddDbContext<TenderManagementDbContext>(options => options.UseSqlServer(connectionString
+                    , sqlOptions =>
+                    {
+                        sqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 5,
+                            maxRetryDelay: TimeSpan.FromSeconds(15),
+                            errorNumbersToAdd: null);
+                    }
+                    ));
+            var serviceProvider = services.BuildServiceProvider();
+            var dataContext = serviceProvider!.GetService<TenderManagementDbContext>();
+
+            //for repositories
+            services.AddSingleton<IEfDataContext>(dataContext!);
+        }
+
+        public static void AddUnitOfWorks(this IServiceCollection services)
+        {
+            services.AddScoped<ITenderManagementUnitOfWork, TenderManagementUnitOfWork>();
+        }
+
         public static IApplicationBuilder UseCustomExceptionHandler(this IApplicationBuilder app) => app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
         public static async Task SeedData(this IServiceProvider? services)

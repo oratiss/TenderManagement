@@ -1,4 +1,4 @@
-﻿namespace TenderManagementDAL.Repositories.Abstractions;
+﻿namespace TenderManagementDAL.UnitOfWorks;
 
 public interface IUnitOfWork
 {

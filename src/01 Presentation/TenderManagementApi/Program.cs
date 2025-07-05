@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System.Data;
 using System.Text;
 using TenderManagementApi.ProgramExtensions;
 using TenderManagementDAL.Contexts;
@@ -11,9 +14,29 @@ using TenderManagementService.AuthenticationServices;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
+}
+else if (builder.Environment.IsProduction())
+{
+    builder.Configuration.AddJsonFile("appsettings.Production.json", optional: true, reloadOnChange: true);
+}
+else if (builder.Environment.IsStaging())
+{
+    builder.Configuration.AddJsonFile("appsettings.Staging.json", optional: true, reloadOnChange: true);
+}
 
-builder.Services.AddDbContext<TenderManagementDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+var configuration = builder.Configuration;
+var connectionString = configuration.GetConnectionString("DefaultConnection")!;
+
+//add write sql services
+builder.Services.AddSqlServer(connectionString);
+builder.Services.AddUnitOfWorks();
+
+//add read sql services
+builder.Services.AddScoped<IDbConnection>(sp =>
+    new SqlConnection(connectionString));
 
 // Identity + EF
 builder.Services.AddIdentity<User, Role>()

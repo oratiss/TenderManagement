@@ -48,7 +48,8 @@ namespace TenderManagementDAL.Repositories.Abstractions
 
         public void Delete(TId id)
         {
-            Delete(GetById(id));
+            var entity = DbSet.Find(id);
+            Delete(entity!);
         }
 
         public async Task AddInBulkAsync(List<TEntity> entities)
@@ -63,7 +64,7 @@ namespace TenderManagementDAL.Repositories.Abstractions
 
         public void DeleteAllInBulk(List<TId> keys)
         {
-            var entitiesToDelete = keys.Select(GetById).ToList();
+            var entitiesToDelete = DbSet.Where(x=> keys.Contains(x.Id)).ToList();
             DbSet.RemoveRange(entitiesToDelete);
         }
     }
