@@ -45,7 +45,62 @@ namespace TenderManagementService.TenderServices
             return existingTender;
         }
 
-        public EditTenderServiceResponse EditTender(EditTenderServiceRequest request)
+        public AddTenderServiceResponse AddTender(AddTenderServiceRequest request)
+        {
+            AddTenderServiceResponse response = new();
+            var existingTender = tenderReadRepository.GetByTitle(request.Title);
+            if (existingTender is not null)
+            {
+                response.Errors =
+                [
+                    new ServiceError()
+                    {
+                        Code = 400,
+                        Message = "An existing tender found with same title."
+                    }
+                ];
+                response.IsSuccessfull = false;
+                return response;
+            }
+
+            Tender toBeAddedTender = request.Adapt<Tender>();
+            toBeAddedTender.Id = 0;
+            var addedTender = unitOfWork.WritableTenderRepository.Add(toBeAddedTender);
+            unitOfWork.SaveChanges();
+            response.Data = addedTender;
+            response.IsSuccessfull = true;
+            return response;
+        }
+
+        public async Task<AddTenderServiceResponse> AddTenderAsync(AddTenderServiceRequest request)
+        {
+            AddTenderServiceResponse response = new();
+            var existingTender = tenderReadRepository.GetByTitle(request.Title);
+            if (existingTender is not null)
+            {
+                response.Errors =
+                [
+                    new ServiceError()
+                    {
+                        Code = 400,
+                        Message = "An existing tender found with same title."
+                    }
+                ];
+                response.IsSuccessfull = false;
+                return response;
+            }
+
+            Tender toBeAddedTender = request.Adapt<Tender>();
+            toBeAddedTender.Id = 0;
+            toBeAddedTender.ModifiedDate = DateTime.UtcNow;
+            var addedTender = await unitOfWork.WritableTenderRepository.AddAsync(toBeAddedTender);
+            await unitOfWork.SaveChangesAsync();
+            response.Data = addedTender;
+            response.IsSuccessfull = true;
+            return response;
+        }
+
+        public EditTenderServiceResponse EditTender(EditTenderServiceRequest request, string userId)
         {
             EditTenderServiceResponse response = new();
             var existingTender = tenderReadRepository.GetById(request.Id);
@@ -64,13 +119,15 @@ namespace TenderManagementService.TenderServices
             }
 
             existingTender = request.Adapt<Tender>();
+            existingTender.ModifiedDate = DateTime.UtcNow;
+            existingTender.ModifierUserId = userId;
             unitOfWork.WritableTenderRepository.Edit(existingTender);
             response.Data = existingTender;
             response.IsSuccessfull = true;
             return response;
         }
 
-        public DeleteTenderServiceResponse DeleteTender(int id)
+        public DeleteTenderServiceResponse DeleteTender(int id, string userId)
         {
             DeleteTenderServiceResponse response = new();
             var existingTender = tenderReadRepository.GetById(id);
@@ -88,7 +145,9 @@ namespace TenderManagementService.TenderServices
                 return response;
             }
 
-            unitOfWork.WritableTenderRepository.Delete(id);
+            existingTender.ModifiedDate = DateTime.UtcNow;
+            existingTender.ModifierUserId = userId;
+            unitOfWork.WritableTenderRepository.Delete(existingTender);
             response.IsSuccessfull = true;
             return response;
         }

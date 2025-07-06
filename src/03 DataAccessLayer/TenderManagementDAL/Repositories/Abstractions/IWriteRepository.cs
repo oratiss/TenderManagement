@@ -6,8 +6,8 @@ namespace TenderManagementDAL.Repositories.Abstractions
     public interface IWriteRepository<TEntity, TId> where TEntity : class
     {
         IQueryable<TEntity> DataSource { get; }
-        void Add(TEntity entity);
-        Task AddAsync(TEntity entity);
+        TEntity Add(TEntity entity);
+        Task<TEntity> AddAsync(TEntity entity);
         void Edit(TEntity entity);
         void Delete(TEntity entity);
         void Delete(TId id);

@@ -11,6 +11,8 @@ public interface ITenderService
     Task<(List<Tender>?, long)> GetAllTendersAsync(GetTendersServiceRequest request);
     Tender? GetTender(int id);
     Task<Tender?> GetTenderAsync(int id);
-    EditTenderServiceResponse EditTender(EditTenderServiceRequest request);
-    DeleteTenderServiceResponse DeleteTender(int id);
+    AddTenderServiceResponse AddTender(AddTenderServiceRequest request);
+    Task<AddTenderServiceResponse> AddTenderAsync(AddTenderServiceRequest request);
+    EditTenderServiceResponse EditTender(EditTenderServiceRequest request, string userId);
+    DeleteTenderServiceResponse DeleteTender(int id, string userId);
 }

@@ -5,4 +5,5 @@ namespace TenderManagementDAL.Repositories.ReadRepositories;
 
 public interface IReadableTenderRepository : IReadRepository<Tender, int>
 {
+    Tender? GetByTitle(string title);
 }

@@ -1,7 +1,10 @@
-﻿using Azure;
-using Microsoft.AspNetCore.Mvc;
-using System.Net;
+﻿using Azure.Core;
 using Mapster;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Net;
+using Microsoft.AspNetCore.Authorization;
+using TenderManagementApi.Controllers.Abstractions;
 using TenderManagementApi.DTOs;
 using TenderManagementApi.DTOs.Abstractions;
 using TenderManagementApi.DTOs.Responses;
@@ -9,24 +12,23 @@ using TenderManagementDAL.Repositories.Abstractions;
 using TenderManagementService.TenderServices;
 using TenderManagementService.TenderServices.Models;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace TenderManagementApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TendersController(ITenderService tenderService) : ControllerBase
+    public class TendersController(ITenderService tenderService, IHttpContextAccessor httpContextAccessor) 
+        : BaseTenderManagementController(httpContextAccessor)
     {
-        private readonly ITenderService _tenderService = tenderService;
 
         // GET: api/<TendersController>
         [HttpGet("Get")]
+        [Authorize(Roles = "admin,vendor")]
         public ActionResult<ApiResponse<GetAllResponse?>> GetAll()
         {
             ApiResponse<GetAllResponse> response = new();
             HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
 
-            var (tenders, count) = _tenderService.GetAllTenders(new GetTendersServiceRequest()
+            var (tenders, count) = tenderService.GetAllTenders(new GetTendersServiceRequest()
             {
                 SortBy = "Id",
                 SortOrder = SortOrder.Asc
@@ -52,12 +54,13 @@ namespace TenderManagementApi.Controllers
 
         // GET api/<TendersController>/5
         [HttpGet("{id}")]
+        [Authorize(Roles = "admin,vendor")]
         public ActionResult<ApiResponse<GetTenderResponse?>> Get(int id)
         {
             ApiResponse<GetTenderResponse> response = new();
             HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
 
-            var existingTender = _tenderService.GetTender(id);
+            var existingTender = tenderService.GetTender(id);
             if (existingTender is null)
             {
                 response.Errors.Add(new Error()
@@ -96,20 +99,117 @@ namespace TenderManagementApi.Controllers
 
         // POST api/<TendersController>
         [HttpPost]
-        public void Post([FromBody] AddTenderDto addTenderRequest)
+        [Authorize(Roles = "admin")]
+        public ActionResult<ApiResponse<AddTenderResponse>> Post([FromBody] AddTenderDto addTenderRequest)
         {
+            ApiResponse<AddTenderResponse> response = new();
+            HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
+
+            //todo: validate request
+            
+            var serviceResponse = tenderService.AddTender(addTenderRequest.Adapt<AddTenderServiceRequest>());
+            if (serviceResponse.Errors!.Any())
+            {
+                switch (serviceResponse.Errors!.First().Code)
+                {
+                    case 400:
+                        httpStatusCode = HttpStatusCode.BadRequest;
+                        break;
+                    case 500:
+                        httpStatusCode = HttpStatusCode.InternalServerError;
+                        break;
+                }
+
+                response.Errors = new List<Error>();
+                serviceResponse.Errors!.ForEach(e => response.Errors.Add(e.Adapt<Error>()));
+                return StatusCode((int)httpStatusCode, response);
+            }
+
+            response.Data = serviceResponse.Data.Adapt<AddTenderResponse>();
+            response.PaginationMetaData = new PaginationMetaData()
+            {
+                PageIndex = 1,
+                PageSize = 1,
+                TotalCount = 1,
+                TotalPages = 1
+            };
+            response.Succeeded = true;
+            httpStatusCode = HttpStatusCode.Created;
+
+            return StatusCode((int)httpStatusCode, response);
         }
 
         // PUT api/<TendersController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [Authorize(Roles = "admin")]
+        public ActionResult<ApiResponse<EditTenderResponse>> Put(int id, [FromBody] EditTenderDto request)
         {
+            ApiResponse<EditTenderResponse> response = new();
+            HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
+
+            //todo: validate request
+
+            var editServiceRequest = request.Adapt<EditTenderServiceRequest>();
+            editServiceRequest.Id = id;
+            var serviceResponse = tenderService.EditTender(editServiceRequest, CurrentUserId!);
+            if (serviceResponse.Errors!.Any())
+            {
+                switch (serviceResponse.Errors!.First().Code)
+                {
+                    case 400:
+                        httpStatusCode = HttpStatusCode.BadRequest;
+                        break;
+                    case 404:
+                        httpStatusCode = HttpStatusCode.NotFound;
+                        break;
+                    case 500:
+                        httpStatusCode = HttpStatusCode.InternalServerError;
+                        break;
+                }
+
+                serviceResponse.Errors = [];
+                serviceResponse.Errors.ForEach(e => response.Errors.Add(e.Adapt<Error>()));
+                return StatusCode((int)httpStatusCode, response);
+            }
+
+            //no data will be returned cause we want to use no content response
+            response.Succeeded = true;
+            httpStatusCode = HttpStatusCode.NoContent;
+
+            return StatusCode((int)httpStatusCode, response);
         }
 
         // DELETE api/<TendersController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        [Authorize(Roles = "admin")]
+        public ActionResult<ApiResponse<DeleteTenderResponse>> Delete(int id)
         {
+            ApiResponse<EditTenderResponse> response = new();
+            HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
+
+            var serviceResponse = tenderService.DeleteTender(id, CurrentUserId!);
+            if (serviceResponse!.Errors!.Any())
+            {
+                switch (serviceResponse.Errors!.First().Code)
+                {
+                    case 404:
+                        httpStatusCode = HttpStatusCode.NotFound;
+                        break;
+                    case 500:
+                        httpStatusCode = HttpStatusCode.InternalServerError;
+                        break;
+                }
+
+                serviceResponse.Errors = [];
+                serviceResponse.Errors.ForEach(e => response.Errors.Add(e.Adapt<Error>()));
+                return StatusCode((int)httpStatusCode, response);
+            }
+
+            //no data will be returned cause we want to use no content response
+            response.Succeeded = true;
+            httpStatusCode = HttpStatusCode.NoContent;
+
+            return StatusCode((int)httpStatusCode, response);
         }
     }
 }

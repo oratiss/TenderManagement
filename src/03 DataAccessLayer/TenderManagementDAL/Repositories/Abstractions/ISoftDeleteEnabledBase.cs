@@ -12,6 +12,6 @@ namespace TenderManagementDAL.Repositories.Abstractions
 
         DateTime? ModifiedDate { get; set; }
 
-        long? ModifierUserId { get; set; }
+        string? ModifierUserId { get; set; }
     }
 }

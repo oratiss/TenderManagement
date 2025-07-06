@@ -17,14 +17,16 @@ namespace TenderManagementDAL.Repositories.Abstractions
 
         public IQueryable<TEntity> DataSource => DbSet;
 
-        public void Add(TEntity entity)
+        public TEntity Add(TEntity entity)
         {
-            DbSet.Add(entity);
+            var addedEntity = DbSet.Add(entity);
+            return addedEntity.Entity;
         }
 
-        public async Task AddAsync(TEntity entity)
+        public async Task<TEntity> AddAsync(TEntity entity)
         {
-            await DbSet.AddAsync(entity);
+            var addedEntity = await DbSet.AddAsync(entity);
+            return addedEntity.Entity;
         }
 
         public void Edit(TEntity entity)

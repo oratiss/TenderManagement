@@ -8,7 +8,7 @@ using TenderManagementDAL.Repositories.Abstractions;
 
 namespace TenderManagementDAL.Models
 {
-    public class Tender: IEntity
+    public class Tender: IEntity, ISoftDeleteEnabled
     {
         public int Id { get; set; }
         public string Title { get; set; } = null!;
@@ -23,6 +23,9 @@ namespace TenderManagementDAL.Models
 
 
         public ICollection<Bid>? Bids { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public string? ModifierUserId { get; set; } //todo: add 36 char length in context
     }
 
 

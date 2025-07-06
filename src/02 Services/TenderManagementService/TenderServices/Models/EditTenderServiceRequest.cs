@@ -10,12 +10,7 @@ namespace TenderManagementService.TenderServices.Models
         public DateTime Deadline { get; set; }
 
         public int CategoryId { get; set; }
-        public Category Category { get; set; } = null!;
 
         public int StatusId { get; set; }
-        public Status Status { get; set; } = null!;
-
-
-        public ICollection<Bid>? Bids { get; set; }
     }
 }
