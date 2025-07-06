@@ -47,7 +47,7 @@ namespace TenderManagementService.AuthenticationServices
 
             var authClaims = new List<Claim>
             {
-                new(JwtRegisteredClaimNames.Sub, user.Email!),
+                new(JwtRegisteredClaimNames.Sub, user.Id),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new(ClaimTypes.NameIdentifier, user.Id),
                 new(ClaimTypes.Email, user.Email!)

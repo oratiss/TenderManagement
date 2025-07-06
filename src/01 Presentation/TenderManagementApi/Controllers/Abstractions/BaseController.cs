@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
 namespace TenderManagementApi.Controllers.Abstractions
 {
@@ -12,12 +14,19 @@ namespace TenderManagementApi.Controllers.Abstractions
             get
             {
                 var httpContext = httpContextAccessor.HttpContext;
-                var userClaim = httpContext?.User.FindFirst("UserId");
-                if (userClaim != null && string.IsNullOrWhiteSpace(userClaim!.Value))
+                if (httpContext?.User == null)
                 {
-                    return HttpContext.User.FindFirst("UserId")!.Value;
+                    return null;
                 }
-                return null;
+
+                var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+
+                if (userIdClaim != null && !string.IsNullOrEmpty(userIdClaim.Value))
+                {
+                    return userIdClaim.Value;
+                }
+
+                return null; // Return null if the NameIden
             }
         }
     }

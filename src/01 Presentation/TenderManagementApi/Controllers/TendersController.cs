@@ -14,28 +14,20 @@ namespace TenderManagementApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class TendersController : ControllerBase
+    public class TendersController(ITenderService tenderService, IHttpContextAccessor httpContextAccessor) : BaseController(httpContextAccessor)
     {
-        private readonly ITenderService _tenderService;
-        // private readonly IHttpContextAccessor _httpContextAccessor; // No longer needed if not inheriting BaseController
-
-        public TendersController(ITenderService tenderService) // <<<--- IMPORTANT CHANGE: Remove httpContextAccessor
-        {
-            _tenderService = tenderService;
-            // _httpContextAccessor = httpContextAccessor; // Remove this line
-        }
-
 
         [HttpGet]
         [Authorize(Roles = "admin")] // Use the role that works for your 'admin' token
         public ActionResult<ApiResponse<GetAllTendersResponse?>> GetAll()
         {
             Console.WriteLine("TendersController.GetAll method was reached!");
+            Console.WriteLine($"Current userId is:{CurrentUserId}");
 
             ApiResponse<GetAllTendersResponse> response = new();
             HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
 
-            var (tenders, count) = _tenderService.GetAllTenders(new GetTendersServiceRequest()
+            var (tenders, count) = tenderService.GetAllTenders(new GetTendersServiceRequest()
             {
                 SortBy = "Id",
                 SortOrder = SortOrder.Asc
