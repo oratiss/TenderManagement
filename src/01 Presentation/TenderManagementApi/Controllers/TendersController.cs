@@ -23,9 +23,9 @@ namespace TenderManagementApi.Controllers
         // GET: api/<TendersController>
         [HttpGet("Get")]
         [Authorize(Roles = "admin,vendor")]
-        public ActionResult<ApiResponse<GetAllResponse?>> GetAll()
+        public ActionResult<ApiResponse<GetAllTendersResponse?>> GetAll()
         {
-            ApiResponse<GetAllResponse> response = new();
+            ApiResponse<GetAllTendersResponse> response = new();
             HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
 
             var (tenders, count) = tenderService.GetAllTenders(new GetTendersServiceRequest()

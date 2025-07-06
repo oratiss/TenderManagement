@@ -2,7 +2,7 @@
 
 namespace TenderManagementApi.DTOs.Responses
 {
-    public class GetAllResponse
+    public class GetAllTendersResponse
     {
         public List<GetTenderResponse>? Tenders { get; set; } = new List<GetTenderResponse>();
     }
@@ -20,4 +20,5 @@ namespace TenderManagementApi.DTOs.Responses
         public int StatusId { get; set; }
         public string Status { get; set; } = null!;
     }
+
 }

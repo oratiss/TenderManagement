@@ -8,6 +8,6 @@ namespace TenderManagementService.TenderServices.Models
         public int? PageIndex { get; set; }
         public int? PageSize { get; set; }
         public SortOrder SortOrder { get; set; }
-        public required string SortBy { get; set; }
+        public required string SortBy { get; set; } = "Id";
     }
 }
