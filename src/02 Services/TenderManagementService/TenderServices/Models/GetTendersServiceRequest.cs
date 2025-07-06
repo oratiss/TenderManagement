@@ -1,7 +1,7 @@
 ﻿using TenderManagementDAL.Repositories.Abstractions;
 using TenderManagementService.AbstractModels;
 
-namespace TenderManagementService.TenderManagementServices.Models
+namespace TenderManagementService.TenderServices.Models
 {
     public class GetTendersServiceRequest : IServiceRequest
     {

@@ -7,6 +7,7 @@ using TenderManagementApi.ProgramExtensions;
 using TenderManagementDAL.Contexts;
 using TenderManagementDAL.Models;
 using TenderManagementService.AuthenticationServices;
+using TenderManagementService.TenderServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,16 +24,6 @@ else if (builder.Environment.IsStaging())
 {
     builder.Configuration.AddJsonFile("appsettings.Staging.json", optional: true, reloadOnChange: true);
 }
-
-var configuration = builder.Configuration;
-var connectionString = configuration.GetConnectionString("DefaultConnection")!;
-
-//add write sql services
-builder.Services.AddSqlServer(connectionString);
-builder.Services.AddUnitOfWorks();
-
-//add read sql services
-builder.Services.AddDapperConnectionAndRepos(connectionString);
 
 // Identity + EF
 builder.Services.AddIdentity<User, Role>()
@@ -56,8 +47,22 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+
 // Register your AuthService
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+var configuration = builder.Configuration;
+var connectionString = configuration.GetConnectionString("DefaultConnection")!;
+
+//add write sql services
+builder.Services.AddSqlServer(connectionString);
+builder.Services.AddUnitOfWorks();
+
+//add read sql services
+builder.Services.AddDapperConnectionAndRepos(connectionString);
+
+//add business layer services
+builder.Services.AddScoped<ITenderService, TenderService>();
 
 
 builder.Services.AddControllers();

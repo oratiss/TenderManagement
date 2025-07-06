@@ -1,15 +1,13 @@
-﻿using Azure.Core;
+﻿using Mapster;
 using TenderManagementDAL.Models;
-using TenderManagementDAL.Repositories.Abstractions;
 using TenderManagementDAL.Repositories.ReadRepositories;
 using TenderManagementDAL.UnitOfWorks;
 using TenderManagementService.AbstractModels;
-using TenderManagementService.TenderManagementServices.Models;
+using TenderManagementService.TenderServices.Models;
 
-namespace TenderManagementService.TenderManagementServices
+namespace TenderManagementService.TenderServices
 {
-
-    public class TenderManagementService(IReadableTenderRepository tenderReadRepository, ITenderManagementUnitOfWork unitOfWork)
+    public class TenderService(IReadableTenderRepository tenderReadRepository, ITenderManagementUnitOfWork unitOfWork) : ITenderService
     {
         public (List<Tender>?, long) GetPaginatedTenders(GetTendersServiceRequest request)
         {

@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TenderManagementDAL.Models;
+﻿using TenderManagementDAL.Models;
 
-namespace TenderManagementService.TenderManagementServices.Models
+namespace TenderManagementService.TenderServices.Models
 {
     public class EditTenderServiceRequest
     {

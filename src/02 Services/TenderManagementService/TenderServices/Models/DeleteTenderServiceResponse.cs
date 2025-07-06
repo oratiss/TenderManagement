@@ -1,7 +1,7 @@
 ﻿using TenderManagementDAL.Models;
 using TenderManagementService.AbstractModels;
 
-namespace TenderManagementService.TenderManagementServices.Models;
+namespace TenderManagementService.TenderServices.Models;
 
 public class DeleteTenderServiceResponse :  IServiceResponse<Tender>
 {
