@@ -8,6 +8,7 @@ using TenderManagementDAL.Contexts;
 using TenderManagementDAL.Models;
 using TenderManagementService.AuthenticationServices;
 using TenderManagementService.TenderServices;
+using TenderManagementService.VendorServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,7 @@ builder.Services.AddIdentity<User, Role>()
     .AddEntityFrameworkStores<TenderManagementDbContext>()
     .AddDefaultTokenProviders();
 
+//todo: add jwt to appsettings
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -65,6 +67,7 @@ builder.Services.AddDapperConnectionAndRepos(connectionString);
 
 //add business layer services
 builder.Services.AddScoped<ITenderService, TenderService>();
+builder.Services.AddScoped<IVendorService, VendorService>();
 
 
 builder.Services.AddControllers();
