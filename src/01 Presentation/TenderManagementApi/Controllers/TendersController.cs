@@ -14,23 +14,28 @@ namespace TenderManagementApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class TendersController(ITenderService tenderService, IHttpContextAccessor httpContextAccessor) 
-    : BaseController(httpContextAccessor)
+    public class TendersController : ControllerBase
     {
+        private readonly ITenderService _tenderService;
+        // private readonly IHttpContextAccessor _httpContextAccessor; // No longer needed if not inheriting BaseController
 
-        /// <summary>
-        /// Gets all tenders.
-        /// </summary>
-        /// <returns>List of tenders with pagination info.</returns>
+        public TendersController(ITenderService tenderService) // <<<--- IMPORTANT CHANGE: Remove httpContextAccessor
+        {
+            _tenderService = tenderService;
+            // _httpContextAccessor = httpContextAccessor; // Remove this line
+        }
+
+
         [HttpGet]
-        //[Authorize(Roles = "admin,vendor")]
-        [Authorize]
+        [Authorize(Roles = "admin")] // Use the role that works for your 'admin' token
         public ActionResult<ApiResponse<GetAllTendersResponse?>> GetAll()
         {
+            Console.WriteLine("TendersController.GetAll method was reached!");
+
             ApiResponse<GetAllTendersResponse> response = new();
             HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
 
-            var (tenders, count) = tenderService.GetAllTenders(new GetTendersServiceRequest()
+            var (tenders, count) = _tenderService.GetAllTenders(new GetTendersServiceRequest()
             {
                 SortBy = "Id",
                 SortOrder = SortOrder.Asc
@@ -54,180 +59,216 @@ namespace TenderManagementApi.Controllers
             return StatusCode((int)httpStatusCode, response);
         }
 
-        /// <summary>
-        // /// Gets a tender by its Id.
-        // /// </summary>
-        // /// <returns> a tender with given Id</returns>
-        [HttpGet("{id}")]
-        [Authorize(Roles = "admin,vendor")]
-        public ActionResult<ApiResponse<GetTenderResponse?>> Get(int id)
-        {
-            ApiResponse<GetTenderResponse> response = new();
-            HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
+        ///// <summary>
+        ///// Gets all tenders.
+        ///// </summary>
+        ///// <returns>List of tenders with pagination info.</returns>
+        //[HttpGet]
+        ////[Authorize(Roles = "admin,vendor")]
+        //[Authorize]
+        //public ActionResult<ApiResponse<GetAllTendersResponse?>> GetAll()
+        //{
+        //    ApiResponse<GetAllTendersResponse> response = new();
+        //    HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
 
-            var existingTender = tenderService.GetTender(id);
-            if (existingTender is null)
-            {
-                response.Errors.Add(new Error()
-                {
-                    Code = 404,
-                    ErrorMessage = "No Tender Found With Given Id"
-                });
-                httpStatusCode = HttpStatusCode.NotFound;
-                return StatusCode((int)httpStatusCode, response);
-            }
+        //    var (tenders, count) = tenderService.GetAllTenders(new GetTendersServiceRequest()
+        //    {
+        //        SortBy = "Id",
+        //        SortOrder = SortOrder.Asc
+        //    });
 
-            response.Data = new()
-            {
-                Id = existingTender.Id,
-                Title = existingTender.Title,
-                Description = existingTender.Description,
-                CategoryId = existingTender.CategoryId,
-                CategoryName = existingTender.Category.Name,
-                Deadline = existingTender.Deadline,
-                StatusId = existingTender.StatusId,
-                Status = existingTender.Status.Name
-            };
+        //    response.Data = new()
+        //    {
+        //        Tenders = tenders is null ? null : tenders!.Adapt<List<GetTenderResponse>>()
+        //    };
 
-            response.PaginationMetaData = new PaginationMetaData()
-            {
-                PageIndex = 1,
-                PageSize = 1,
-                TotalCount = 1,
-                TotalPages = 1
-            };
-            response.Succeeded = true;
-            httpStatusCode = HttpStatusCode.OK;
+        //    response.PaginationMetaData = tenders is null ? null : new PaginationMetaData
+        //    {
+        //        PageIndex = 1,
+        //        PageSize = count,
+        //        TotalCount = count,
+        //        TotalPages = 1
+        //    };
+        //    response.Succeeded = true;
+        //    httpStatusCode = HttpStatusCode.OK;
 
-            return StatusCode((int)httpStatusCode, response);
-        }
+        //    return StatusCode((int)httpStatusCode, response);
+        //}
 
-        /// <summary>
-        /// adds a Tender
-        /// </summary>
-        /// <param name="addTenderRequest"></param>
-        /// <returns>the added tender with its Id</returns>
-        [HttpPost]
-        [Authorize(Roles = "admin")]
-        public ActionResult<ApiResponse<AddTenderResponse>> Post([FromBody] AddTenderDto addTenderRequest)
-        {
-            ApiResponse<AddTenderResponse> response = new();
-            HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
+        ///// <summary>
+        //// /// Gets a tender by its Id.
+        //// /// </summary>
+        //// /// <returns> a tender with given Id</returns>
+        //[HttpGet("{id}")]
+        //[Authorize(Roles = "admin,vendor")]
+        //public ActionResult<ApiResponse<GetTenderResponse?>> Get(int id)
+        //{
+        //    ApiResponse<GetTenderResponse> response = new();
+        //    HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
 
-            //todo: validate request
+        //    var existingTender = tenderService.GetTender(id);
+        //    if (existingTender is null)
+        //    {
+        //        response.Errors.Add(new Error()
+        //        {
+        //            Code = 404,
+        //            ErrorMessage = "No Tender Found With Given Id"
+        //        });
+        //        httpStatusCode = HttpStatusCode.NotFound;
+        //        return StatusCode((int)httpStatusCode, response);
+        //    }
 
-            var serviceResponse = tenderService.AddTender(addTenderRequest.Adapt<AddTenderServiceRequest>());
-            if (serviceResponse.Errors!.Any())
-            {
-                switch (serviceResponse.Errors!.First().Code)
-                {
-                    case 400:
-                        httpStatusCode = HttpStatusCode.BadRequest;
-                        break;
-                    case 500:
-                        httpStatusCode = HttpStatusCode.InternalServerError;
-                        break;
-                }
+        //    response.Data = new()
+        //    {
+        //        Id = existingTender.Id,
+        //        Title = existingTender.Title,
+        //        Description = existingTender.Description,
+        //        CategoryId = existingTender.CategoryId,
+        //        CategoryName = existingTender.Category.Name,
+        //        Deadline = existingTender.Deadline,
+        //        StatusId = existingTender.StatusId,
+        //        Status = existingTender.Status.Name
+        //    };
 
-                response.Errors = new List<Error>();
-                serviceResponse.Errors!.ForEach(e => response.Errors.Add(e.Adapt<Error>()));
-                return StatusCode((int)httpStatusCode, response);
-            }
+        //    response.PaginationMetaData = new PaginationMetaData()
+        //    {
+        //        PageIndex = 1,
+        //        PageSize = 1,
+        //        TotalCount = 1,
+        //        TotalPages = 1
+        //    };
+        //    response.Succeeded = true;
+        //    httpStatusCode = HttpStatusCode.OK;
 
-            response.Data = serviceResponse.Data.Adapt<AddTenderResponse>();
-            response.PaginationMetaData = new PaginationMetaData()
-            {
-                PageIndex = 1,
-                PageSize = 1,
-                TotalCount = 1,
-                TotalPages = 1
-            };
-            response.Succeeded = true;
-            httpStatusCode = HttpStatusCode.Created;
+        //    return StatusCode((int)httpStatusCode, response);
+        //}
 
-            return StatusCode((int)httpStatusCode, response);
-        }
+        ///// <summary>
+        ///// adds a Tender
+        ///// </summary>
+        ///// <param name="addTenderRequest"></param>
+        ///// <returns>the added tender with its Id</returns>
+        //[HttpPost]
+        //[Authorize(Roles = "admin")]
+        //public ActionResult<ApiResponse<AddTenderResponse>> Post([FromBody] AddTenderDto addTenderRequest)
+        //{
+        //    ApiResponse<AddTenderResponse> response = new();
+        //    HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
 
-        /// <summary>
-        /// Edits a Tender with given props of request. editing title should be not available in system.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="request"></param>
-        /// <returns>nothing returns  - 204 should be sent in case of success</returns>
-        [HttpPut("{id}")]
-        [Authorize(Roles = "admin")]
-        public ActionResult<ApiResponse<EditTenderResponse>> Put(int id, [FromBody] EditTenderDto request)
-        {
-            ApiResponse<EditTenderResponse> response = new();
-            HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
+        //    //todo: validate request
 
-            //todo: validate request
+        //    var serviceResponse = tenderService.AddTender(addTenderRequest.Adapt<AddTenderServiceRequest>());
+        //    if (serviceResponse.Errors!.Any())
+        //    {
+        //        switch (serviceResponse.Errors!.First().Code)
+        //        {
+        //            case 400:
+        //                httpStatusCode = HttpStatusCode.BadRequest;
+        //                break;
+        //            case 500:
+        //                httpStatusCode = HttpStatusCode.InternalServerError;
+        //                break;
+        //        }
 
-            var editServiceRequest = request.Adapt<EditTenderServiceRequest>();
-            editServiceRequest.Id = id;
-            var serviceResponse = tenderService.EditTender(editServiceRequest, CurrentUserId!);
-            if (serviceResponse.Errors!.Any())
-            {
-                switch (serviceResponse.Errors!.First().Code)
-                {
-                    case 400:
-                        httpStatusCode = HttpStatusCode.BadRequest;
-                        break;
-                    case 404:
-                        httpStatusCode = HttpStatusCode.NotFound;
-                        break;
-                    case 500:
-                        httpStatusCode = HttpStatusCode.InternalServerError;
-                        break;
-                }
+        //        response.Errors = new List<Error>();
+        //        serviceResponse.Errors!.ForEach(e => response.Errors.Add(e.Adapt<Error>()));
+        //        return StatusCode((int)httpStatusCode, response);
+        //    }
 
-                serviceResponse.Errors = [];
-                serviceResponse.Errors.ForEach(e => response.Errors.Add(e.Adapt<Error>()));
-                return StatusCode((int)httpStatusCode, response);
-            }
+        //    response.Data = serviceResponse.Data.Adapt<AddTenderResponse>();
+        //    response.PaginationMetaData = new PaginationMetaData()
+        //    {
+        //        PageIndex = 1,
+        //        PageSize = 1,
+        //        TotalCount = 1,
+        //        TotalPages = 1
+        //    };
+        //    response.Succeeded = true;
+        //    httpStatusCode = HttpStatusCode.Created;
 
-            //no data will be returned cause we want to use no content response
-            response.Succeeded = true;
-            httpStatusCode = HttpStatusCode.NoContent;
+        //    return StatusCode((int)httpStatusCode, response);
+        //}
 
-            return StatusCode((int)httpStatusCode, response);
-        }
+        ///// <summary>
+        ///// Edits a Tender with given props of request. editing title should be not available in system.
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <param name="request"></param>
+        ///// <returns>nothing returns  - 204 should be sent in case of success</returns>
+        //[HttpPut("{id}")]
+        //[Authorize(Roles = "admin")]
+        //public ActionResult<ApiResponse<EditTenderResponse>> Put(int id, [FromBody] EditTenderDto request)
+        //{
+        //    ApiResponse<EditTenderResponse> response = new();
+        //    HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
 
-        /// <summary>
-        /// Deletes a tender by its Id.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns>nothing returns  - 204 should be sent in case of success</returns>
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "admin")]
-        public ActionResult<ApiResponse<DeleteTenderResponse>> Delete(int id)
-        {
-            ApiResponse<EditTenderResponse> response = new();
-            HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
+        //    //todo: validate request
 
-            var serviceResponse = tenderService.DeleteTender(id, CurrentUserId!);
-            if (serviceResponse!.Errors!.Any())
-            {
-                switch (serviceResponse.Errors!.First().Code)
-                {
-                    case 404:
-                        httpStatusCode = HttpStatusCode.NotFound;
-                        break;
-                    case 500:
-                        httpStatusCode = HttpStatusCode.InternalServerError;
-                        break;
-                }
+        //    var editServiceRequest = request.Adapt<EditTenderServiceRequest>();
+        //    editServiceRequest.Id = id;
+        //    var serviceResponse = tenderService.EditTender(editServiceRequest, CurrentUserId!);
+        //    if (serviceResponse.Errors!.Any())
+        //    {
+        //        switch (serviceResponse.Errors!.First().Code)
+        //        {
+        //            case 400:
+        //                httpStatusCode = HttpStatusCode.BadRequest;
+        //                break;
+        //            case 404:
+        //                httpStatusCode = HttpStatusCode.NotFound;
+        //                break;
+        //            case 500:
+        //                httpStatusCode = HttpStatusCode.InternalServerError;
+        //                break;
+        //        }
 
-                serviceResponse.Errors = [];
-                serviceResponse.Errors.ForEach(e => response.Errors.Add(e.Adapt<Error>()));
-                return StatusCode((int)httpStatusCode, response);
-            }
+        //        serviceResponse.Errors = [];
+        //        serviceResponse.Errors.ForEach(e => response.Errors.Add(e.Adapt<Error>()));
+        //        return StatusCode((int)httpStatusCode, response);
+        //    }
 
-            //no data will be returned cause we want to use no content response
-            response.Succeeded = true;
-            httpStatusCode = HttpStatusCode.NoContent;
+        //    //no data will be returned cause we want to use no content response
+        //    response.Succeeded = true;
+        //    httpStatusCode = HttpStatusCode.NoContent;
 
-            return StatusCode((int)httpStatusCode, response);
-        }
+        //    return StatusCode((int)httpStatusCode, response);
+        //}
+
+        ///// <summary>
+        ///// Deletes a tender by its Id.
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <returns>nothing returns  - 204 should be sent in case of success</returns>
+        //[HttpDelete("{id}")]
+        //[Authorize(Roles = "admin")]
+        //public ActionResult<ApiResponse<DeleteTenderResponse>> Delete(int id)
+        //{
+        //    ApiResponse<EditTenderResponse> response = new();
+        //    HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
+
+        //    var serviceResponse = tenderService.DeleteTender(id, CurrentUserId!);
+        //    if (serviceResponse!.Errors!.Any())
+        //    {
+        //        switch (serviceResponse.Errors!.First().Code)
+        //        {
+        //            case 404:
+        //                httpStatusCode = HttpStatusCode.NotFound;
+        //                break;
+        //            case 500:
+        //                httpStatusCode = HttpStatusCode.InternalServerError;
+        //                break;
+        //        }
+
+        //        serviceResponse.Errors = [];
+        //        serviceResponse.Errors.ForEach(e => response.Errors.Add(e.Adapt<Error>()));
+        //        return StatusCode((int)httpStatusCode, response);
+        //    }
+
+        //    //no data will be returned cause we want to use no content response
+        //    response.Succeeded = true;
+        //    httpStatusCode = HttpStatusCode.NoContent;
+
+        //    return StatusCode((int)httpStatusCode, response);
+        //}
     }
 }
