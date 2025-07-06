@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace TenderManagementApi.Controllers.Abstractions
 {
-    public class BaseTenderManagementController(IHttpContextAccessor httpContextAccessor) : ControllerBase
+    [ApiController]
+    [Authorize]
+    public class BaseController(IHttpContextAccessor httpContextAccessor) : ControllerBase
     {
         protected string? CurrentUserId
         {

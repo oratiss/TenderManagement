@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 using TenderManagementApi.ProgramExtensions;
 using TenderManagementDAL.Contexts;
@@ -26,18 +27,28 @@ else if (builder.Environment.IsStaging())
     builder.Configuration.AddJsonFile("appsettings.Staging.json", optional: true, reloadOnChange: true);
 }
 
+string _allowSpecificOrigins = "_allowSpecificOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: _allowSpecificOrigins, cp =>
+    {
+        cp.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 // Identity + EF
-builder.Services.AddIdentity<User, Role>()
+builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<TenderManagementDbContext>()
     .AddDefaultTokenProviders();
 
-//todo: add jwt to appsettings
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            RoleClaimType = "roles",
+            RoleClaimType = ClaimTypes.Role,
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
@@ -70,16 +81,23 @@ builder.Services.AddDapperConnectionAndRepos(connectionString);
 builder.Services.AddScoped<ITenderService, TenderService>();
 builder.Services.AddScoped<IVendorService, VendorService>();
 
-
-builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddEndpointsApiExplorer();
 
+builder.AddSwagger();
 
-
+builder.Services.AddControllers();
 
 var app = builder.Build();
+
+app.UseCors(builder =>
+{
+    builder.AllowAnyHeader()
+        .AllowAnyOrigin()
+        .AllowAnyMethod();
+});
 
 // Run data seeding
 using (var scope = app.Services.CreateScope())
@@ -90,10 +108,15 @@ using (var scope = app.Services.CreateScope())
 
 app.UseCustomExceptionHandler();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Trade Management API V1");
+    });
 }
 
 app.UseHttpsRedirection();

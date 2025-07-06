@@ -15,7 +15,7 @@ namespace TenderManagementApi.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class VendorsController(IVendorService vendorService, IHttpContextAccessor httpContextAccessor) 
-    : BaseTenderManagementController(httpContextAccessor)
+    : BaseController(httpContextAccessor)
 {
 
     // GET: api/<TendersController>

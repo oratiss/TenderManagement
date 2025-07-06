@@ -1,9 +1,7 @@
-﻿using Azure.Core;
-using Mapster;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Net;
+﻿using Mapster;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using TenderManagementApi.Controllers.Abstractions;
 using TenderManagementApi.DTOs;
 using TenderManagementApi.DTOs.Abstractions;
@@ -14,15 +12,19 @@ using TenderManagementService.TenderServices.Models;
 
 namespace TenderManagementApi.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class TendersController(ITenderService tenderService, IHttpContextAccessor httpContextAccessor) 
-        : BaseTenderManagementController(httpContextAccessor)
+    [Route("api/[controller]")]
+    public class TendersController(ITenderService tenderService, IHttpContextAccessor httpContextAccessor)
+        : BaseController(httpContextAccessor)
     {
 
-        // GET: api/<TendersController>
-        [HttpGet("Get")]
-        [Authorize(Roles = "admin,vendor")]
+        /// <summary>
+        /// Gets all tenders.
+        /// </summary>
+        /// <returns>List of tenders with pagination info.</returns>
+        [HttpGet]
+        //[Authorize(Roles = "admin,vendor")]
+        [Authorize]
         public ActionResult<ApiResponse<GetAllTendersResponse?>> GetAll()
         {
             ApiResponse<GetAllTendersResponse> response = new();
@@ -52,7 +54,10 @@ namespace TenderManagementApi.Controllers
             return StatusCode((int)httpStatusCode, response);
         }
 
-        // GET api/<TendersController>/5
+        /// <summary>
+        // /// Gets a tender by its Id.
+        // /// </summary>
+        // /// <returns> a tender with given Id</returns>
         [HttpGet("{id}")]
         [Authorize(Roles = "admin,vendor")]
         public ActionResult<ApiResponse<GetTenderResponse?>> Get(int id)
@@ -97,7 +102,11 @@ namespace TenderManagementApi.Controllers
             return StatusCode((int)httpStatusCode, response);
         }
 
-        // POST api/<TendersController>
+        /// <summary>
+        /// adds a Tender
+        /// </summary>
+        /// <param name="addTenderRequest"></param>
+        /// <returns>the added tender with its Id</returns>
         [HttpPost]
         [Authorize(Roles = "admin")]
         public ActionResult<ApiResponse<AddTenderResponse>> Post([FromBody] AddTenderDto addTenderRequest)
@@ -106,7 +115,7 @@ namespace TenderManagementApi.Controllers
             HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
 
             //todo: validate request
-            
+
             var serviceResponse = tenderService.AddTender(addTenderRequest.Adapt<AddTenderServiceRequest>());
             if (serviceResponse.Errors!.Any())
             {
@@ -139,7 +148,12 @@ namespace TenderManagementApi.Controllers
             return StatusCode((int)httpStatusCode, response);
         }
 
-        // PUT api/<TendersController>/5
+        /// <summary>
+        /// Edits a Tender with given props of request. editing title should be not available in system.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="request"></param>
+        /// <returns>nothing returns  - 204 should be sent in case of success</returns>
         [HttpPut("{id}")]
         [Authorize(Roles = "admin")]
         public ActionResult<ApiResponse<EditTenderResponse>> Put(int id, [FromBody] EditTenderDto request)
@@ -179,7 +193,11 @@ namespace TenderManagementApi.Controllers
             return StatusCode((int)httpStatusCode, response);
         }
 
-        // DELETE api/<TendersController>/5
+        /// <summary>
+        /// Deletes a tender by its Id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>nothing returns  - 204 should be sent in case of success</returns>
         [HttpDelete("{id}")]
         [Authorize(Roles = "admin")]
         public ActionResult<ApiResponse<DeleteTenderResponse>> Delete(int id)
