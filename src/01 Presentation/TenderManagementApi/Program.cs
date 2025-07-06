@@ -43,7 +43,12 @@ builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<TenderManagementDbContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme; // Add this line
+    })
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -82,7 +87,7 @@ builder.Services.AddScoped<ITenderService, TenderService>();
 builder.Services.AddScoped<IVendorService, VendorService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+//builder.Services.AddOpenApi();
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -110,7 +115,7 @@ app.UseCustomExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    //app.MapOpenApi();
     
     app.UseSwagger();
     app.UseSwaggerUI(c =>

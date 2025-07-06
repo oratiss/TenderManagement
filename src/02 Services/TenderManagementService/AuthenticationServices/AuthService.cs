@@ -13,7 +13,10 @@ namespace TenderManagementService.AuthenticationServices
         public async Task<string> RegisterAsync(string email, string password, bool? isAdmin)
         {
             var user = new User { UserName = email, Email = email };
-            
+
+            var result = await userManager.CreateAsync(user, password);
+            if (!result.Succeeded) throw new Exception("User registration failed.");
+
             switch (isAdmin)
             {
                 case null or false:
@@ -23,9 +26,6 @@ namespace TenderManagementService.AuthenticationServices
                     await userManager.AddToRoleAsync(user, "admin");
                     break;
             }
-
-            var result = await userManager.CreateAsync(user, password);
-            if (!result.Succeeded) throw new Exception("User registration failed.");
 
             return "User registered.";
         }
