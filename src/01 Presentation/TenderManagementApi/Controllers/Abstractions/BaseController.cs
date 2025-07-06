@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 namespace TenderManagementApi.Controllers.Abstractions
 {
     [ApiController]
-    [Authorize]
     public class BaseController(IHttpContextAccessor httpContextAccessor) : ControllerBase
     {
         protected string? CurrentUserId

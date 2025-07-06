@@ -153,11 +153,27 @@ namespace TenderManagementApi.ProgramExtensions
                     }
                 };
 
-                c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+                //c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+                c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, jwtSecurityScheme);
 
+                //c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                //{
+                //    { jwtSecurityScheme, new List<string>() }
+                //});
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
-                    { jwtSecurityScheme, Array.Empty<string>() }
+                    {
+                        // Create a new reference to the *defined* security scheme
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = JwtBearerDefaults.AuthenticationScheme // Referencing the ID you defined above ("Bearer")
+                            }
+                        },
+                        new List<string>() // Scopes required for this security scheme (empty for general JWT)
+                    }
                 });
             });
         }

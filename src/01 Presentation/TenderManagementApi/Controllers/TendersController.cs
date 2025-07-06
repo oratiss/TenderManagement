@@ -14,8 +14,8 @@ namespace TenderManagementApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class TendersController(ITenderService tenderService, IHttpContextAccessor httpContextAccessor)
-        : BaseController(httpContextAccessor)
+    public class TendersController(ITenderService tenderService, IHttpContextAccessor httpContextAccessor) 
+    : BaseController(httpContextAccessor)
     {
 
         /// <summary>
