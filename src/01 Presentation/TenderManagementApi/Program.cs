@@ -9,6 +9,7 @@ using TenderManagementDAL.Contexts;
 using TenderManagementDAL.Models;
 using TenderManagementService.AuthenticationServices;
 using TenderManagementService.BidServices;
+using TenderManagementService.CategoryServices;
 using TenderManagementService.TenderServices;
 using TenderManagementService.VendorServices;
 
@@ -87,6 +88,7 @@ builder.Services.AddDapperConnectionAndRepos(connectionString);
 builder.Services.AddScoped<ITenderService, TenderService>();
 builder.Services.AddScoped<IVendorService, VendorService>();
 builder.Services.AddScoped<IBidService, BidService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();

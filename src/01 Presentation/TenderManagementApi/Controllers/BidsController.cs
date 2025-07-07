@@ -16,7 +16,11 @@ namespace TenderManagementApi.Controllers
     public class BidsController(IBidService bidService, IHttpContextAccessor httpContextAccessor) 
         : BaseController(httpContextAccessor)
     {
-
+        /// <summary>
+        /// Adds a new Bid
+        /// </summary>
+        /// <param name="addBidRequest"></param>
+        /// <returns>added bid</returns>
         [HttpPost]
         [Authorize(Roles = "admin,vendor")]
         public ActionResult<ApiResponse<BidResponse>> Post([FromBody] AddBidDto addBidRequest)
@@ -59,7 +63,7 @@ namespace TenderManagementApi.Controllers
         }
 
         /// <summary>
-        /// Edits a Tender with given props of request. editing title should be not available in system.
+        /// Edits a Bid with given props of request.
         /// </summary>
         /// <param name="id"></param>
         /// <param name="request"></param>

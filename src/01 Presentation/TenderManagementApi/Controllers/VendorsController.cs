@@ -18,7 +18,10 @@ public class VendorsController(IVendorService vendorService, IHttpContextAccesso
     : BaseController(httpContextAccessor)
 {
 
-    // GET: api/<TendersController>
+    /// <summary>
+    /// Gets All Vendors
+    /// </summary>
+    /// <returns> a list of vendors</returns>
     [HttpGet("Get")]
     [Authorize(Roles = "admin,vendor")]
     public ActionResult<ApiResponse<GetAllVendorsResponse?>> GetAll()
@@ -50,7 +53,11 @@ public class VendorsController(IVendorService vendorService, IHttpContextAccesso
         return StatusCode((int)httpStatusCode, response);
     }
 
-    // GET api/<TendersController>/5
+    /// <summary>
+    /// returns a vendor by its Id.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns>a vendor</returns>
     [HttpGet("{id}")]
     [Authorize(Roles = "admin,vendor")]
     public ActionResult<ApiResponse<GetVendorResponse?>> Get([FromRoute] int id)
@@ -91,7 +98,11 @@ public class VendorsController(IVendorService vendorService, IHttpContextAccesso
         return StatusCode((int)httpStatusCode, response);
     }
 
-    // POST api/<TendersController>
+    /// <summary>
+    /// adds a new vendor
+    /// </summary>
+    /// <param name="addVendorRequest"></param>
+    /// <returns>new added vendor</returns>
     [HttpPost]
     [Authorize(Roles = "admin,vendor")]
     public ActionResult<ApiResponse<GetVendorResponse>> Post([FromBody] AddVendorDto addVendorRequest)

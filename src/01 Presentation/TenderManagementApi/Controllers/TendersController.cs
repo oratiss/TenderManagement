@@ -54,9 +54,9 @@ namespace TenderManagementApi.Controllers
 
 
         /// <summary>
-        // /// Gets a tender by its Id.
-        // /// </summary>
-        // /// <returns> a tender with given Id</returns>
+        /// Gets a tender by its Id.
+        /// </summary>
+        /// <returns> a tender with given Id</returns>
         [HttpGet("{id}")]
         [Authorize(Roles = "admin,vendor")]
         public ActionResult<ApiResponse<GetTenderResponse?>> Get([FromRoute] int id)
@@ -155,7 +155,7 @@ namespace TenderManagementApi.Controllers
         /// <returns>nothing returns  - 204 should be sent in case of success</returns>
         [HttpPut("{id}")]
         [Authorize(Roles = "admin")]
-        public ActionResult<ApiResponse<EditTenderResponse>> Put([FromRoute]int id, [FromBody] EditTenderDto request)
+        public ActionResult<ApiResponse<EditTenderResponse>> Put([FromRoute] int id, [FromBody] EditTenderDto request)
         {
             ApiResponse<EditTenderResponse> response = new();
             HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
@@ -199,7 +199,7 @@ namespace TenderManagementApi.Controllers
         /// <returns>nothing returns  - 204 should be sent in case of success</returns>
         [HttpDelete("{id}")]
         [Authorize(Roles = "admin")]
-        public ActionResult<ApiResponse<DeleteTenderResponse>> Delete([FromRoute]int id)
+        public ActionResult<ApiResponse<DeleteTenderResponse>> Delete([FromRoute] int id)
         {
             ApiResponse<EditTenderResponse> response = new();
             HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
