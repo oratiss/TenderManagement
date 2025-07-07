@@ -8,4 +8,6 @@ public class BidServiceResponse
     public int StatusId { get; set; }
     public string Status { get; set; } = null!;
     public string Comment { get; set; } = null!;
+    public int VendorId { get; set; }
+    public int TenderId { get; set; }
 }

@@ -1,16 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Mapster;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using Mapster;
 using TenderManagementApi.Controllers.Abstractions;
 using TenderManagementApi.DTOs;
 using TenderManagementApi.DTOs.Abstractions;
 using TenderManagementApi.DTOs.Responses;
 using TenderManagementService.BidServices;
 using TenderManagementService.BidServices.Models;
-using TenderManagementService.TenderServices;
-using TenderManagementService.TenderServices.Models;
 
 namespace TenderManagementApi.Controllers
 {

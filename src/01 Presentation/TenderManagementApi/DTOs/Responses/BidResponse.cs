@@ -9,5 +9,6 @@ public class BidResponse
     public int VendorId { get; set; }
     public decimal Amount { get; set; }
     public string? Comment { get; set; }
+    public DateTime SubmissionDateTime { get; set; }
     public string Status { get; set; } = StatusType.Pending.ToString();
 }

@@ -9,7 +9,7 @@ using TenderManagementService.VendorServices.Models;
 
 namespace TenderManagementService.BidServices;
 
-public class BidService(IReadableBidRepository readBidRepoistory, ITenderManagementUnitOfWork unitOfWork) : IBidService
+public class BidService(IReadableBidRepository readBidRepository, ITenderManagementUnitOfWork unitOfWork) : IBidService
 {
     public GetBidServiceResponse AddBid(AddBidServiceRequest request)
     {
@@ -40,7 +40,7 @@ public class BidService(IReadableBidRepository readBidRepoistory, ITenderManagem
     public GetBidServiceResponse EditBid(EditBidServiceRequest request, string modifierUserId)
     {
         GetBidServiceResponse response = new();
-        var existingBid = readBidRepoistory.GetById(request.Id);
+        var existingBid = readBidRepository.GetById(request.Id);
         if (existingBid is null)
         {
             response.Errors =
