@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TenderManagementDAL.Contexts;
 
@@ -11,9 +12,11 @@ using TenderManagementDAL.Contexts;
 namespace TenderManagementDAL.Migrations
 {
     [DbContext(typeof(TenderManagementDbContext))]
-    partial class TenderManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250707204406_category-soft-delete-enabled")]
+    partial class categorysoftdeleteenabled
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
