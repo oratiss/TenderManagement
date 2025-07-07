@@ -53,7 +53,7 @@ public class VendorsController(IVendorService vendorService, IHttpContextAccesso
     // GET api/<TendersController>/5
     [HttpGet("{id}")]
     [Authorize(Roles = "admin,vendor")]
-    public ActionResult<ApiResponse<GetVendorResponse?>> Get(int id)
+    public ActionResult<ApiResponse<GetVendorResponse?>> Get([FromRoute] int id)
     {
         ApiResponse<GetVendorResponse> response = new();
         HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;

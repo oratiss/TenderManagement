@@ -12,8 +12,8 @@ using TenderManagementService.TenderServices.Models;
 
 namespace TenderManagementApi.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class TendersController(ITenderService tenderService, IHttpContextAccessor httpContextAccessor) : BaseController(httpContextAccessor)
     {
         /// <summary>
