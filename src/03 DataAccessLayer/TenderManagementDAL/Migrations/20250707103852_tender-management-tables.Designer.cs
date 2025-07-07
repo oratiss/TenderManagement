@@ -12,8 +12,8 @@ using TenderManagementDAL.Contexts;
 namespace TenderManagementDAL.Migrations
 {
     [DbContext(typeof(TenderManagementDbContext))]
-    [Migration("20250703171737_InitIdentity")]
-    partial class InitIdentity
+    [Migration("20250707103852_tender-management-tables")]
+    partial class tendermanagementtables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -158,6 +158,154 @@ namespace TenderManagementDAL.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("TenderManagementDAL.Models.Bid", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("StatusId1")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("SubmissionDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("TenderId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("VendorId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StatusId1");
+
+                    b.HasIndex("TenderId");
+
+                    b.HasIndex("VendorId");
+
+                    b.ToTable("Bids");
+                });
+
+            modelBuilder.Entity("TenderManagementDAL.Models.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("TenderManagementDAL.Models.Status", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Statuses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Name = "Open"
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Name = "Closed"
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            Name = "Pending"
+                        },
+                        new
+                        {
+                            Id = 4L,
+                            Name = "Approved"
+                        },
+                        new
+                        {
+                            Id = 5L,
+                            Name = "Rejected"
+                        });
+                });
+
+            modelBuilder.Entity("TenderManagementDAL.Models.Tender", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Deadline")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifierUserId")
+                        .HasMaxLength(36)
+                        .HasColumnType("nvarchar(36)");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("StatusId1")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(70)
+                        .HasColumnType("nvarchar(70)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("StatusId1");
+
+                    b.ToTable("Tenders");
+                });
+
             modelBuilder.Entity("TenderManagementDAL.Models.User", b =>
                 {
                     b.Property<string>("Id")
@@ -223,6 +371,38 @@ namespace TenderManagementDAL.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("TenderManagementDAL.Models.Vendor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ModifierUserId")
+                        .HasMaxLength(36)
+                        .HasColumnType("nvarchar(36)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Vendors");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -272,6 +452,61 @@ namespace TenderManagementDAL.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("TenderManagementDAL.Models.Bid", b =>
+                {
+                    b.HasOne("TenderManagementDAL.Models.Status", "Status")
+                        .WithMany("Bids")
+                        .HasForeignKey("StatusId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TenderManagementDAL.Models.Tender", null)
+                        .WithMany("Bids")
+                        .HasForeignKey("TenderId");
+
+                    b.HasOne("TenderManagementDAL.Models.Vendor", null)
+                        .WithMany("Bids")
+                        .HasForeignKey("VendorId");
+
+                    b.Navigation("Status");
+                });
+
+            modelBuilder.Entity("TenderManagementDAL.Models.Tender", b =>
+                {
+                    b.HasOne("TenderManagementDAL.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TenderManagementDAL.Models.Status", "Status")
+                        .WithMany("Tenders")
+                        .HasForeignKey("StatusId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Status");
+                });
+
+            modelBuilder.Entity("TenderManagementDAL.Models.Status", b =>
+                {
+                    b.Navigation("Bids");
+
+                    b.Navigation("Tenders");
+                });
+
+            modelBuilder.Entity("TenderManagementDAL.Models.Tender", b =>
+                {
+                    b.Navigation("Bids");
+                });
+
+            modelBuilder.Entity("TenderManagementDAL.Models.Vendor", b =>
+                {
+                    b.Navigation("Bids");
                 });
 #pragma warning restore 612, 618
         }
