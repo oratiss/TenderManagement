@@ -2,23 +2,18 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using TenderManagementApi.Controllers.Abstractions;
-using TenderManagementApi.DTOs;
 using TenderManagementApi.DTOs.Abstractions;
 using TenderManagementApi.DTOs.Responses;
-using TenderManagementDAL.Repositories.Abstractions;
 using TenderManagementService.CategoryServices;
-using TenderManagementService.TenderServices;
-using TenderManagementService.TenderServices.Models;
 
 namespace TenderManagementApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoriesController(ICategoryService categoriesService, IHttpContextAccessor httpContextAccessor) : BaseController(httpContextAccessor)
+    public class CategoriesController(ICategoryService categoriesService) : ControllerBase
     {
         /// <summary>
-        /// Returns All Categories for admin
+        /// Returns All Categories
         /// </summary>
         /// <returns></returns>
         [HttpGet]
