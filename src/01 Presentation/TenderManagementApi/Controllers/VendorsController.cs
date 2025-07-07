@@ -26,7 +26,7 @@ public class VendorsController(IVendorService vendorService, IHttpContextAccesso
         ApiResponse<GetAllVendorsResponse> response = new();
         HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
 
-        var (vendors, count) = vendorService.GetAllVendors(new GetVendorsServiceRequest()
+        var (vendors, count) = vendorService.GetAllVendors(new GetVendorsPaginatedServiceRequest()
         {
             SortBy = "Id",
             SortOrder = SortOrder.Asc

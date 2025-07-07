@@ -2,7 +2,7 @@
 
 namespace TenderManagementService.AbstractModels
 {
-    public interface IServiceRequest
+    public interface IPaginatedServiceRequest
     {
         public int? PageIndex { get; set; }
         public int? PageSize { get; set; }

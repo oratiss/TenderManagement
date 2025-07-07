@@ -8,6 +8,7 @@ using TenderManagementApi.ProgramExtensions;
 using TenderManagementDAL.Contexts;
 using TenderManagementDAL.Models;
 using TenderManagementService.AuthenticationServices;
+using TenderManagementService.BidServices;
 using TenderManagementService.TenderServices;
 using TenderManagementService.VendorServices;
 
@@ -85,6 +86,7 @@ builder.Services.AddDapperConnectionAndRepos(connectionString);
 //add business layer services
 builder.Services.AddScoped<ITenderService, TenderService>();
 builder.Services.AddScoped<IVendorService, VendorService>();
+builder.Services.AddScoped<IBidService, BidService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
@@ -135,4 +137,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-app.Run();
+

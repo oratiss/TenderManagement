@@ -3,7 +3,7 @@ using TenderManagementService.AbstractModels;
 
 namespace TenderManagementService.TenderServices.Models
 {
-    public class GetTendersServiceRequest : IServiceRequest
+    public class GetTendersPaginatedServiceRequest : IPaginatedServiceRequest
     {
         public int? PageIndex { get; set; }
         public int? PageSize { get; set; }

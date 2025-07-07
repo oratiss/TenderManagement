@@ -9,25 +9,25 @@ namespace TenderManagementService.VendorServices;
 
 public class VendorService(IReadableVendorRepository vendorReadRepository, ITenderManagementUnitOfWork unitOfWork) : IVendorService
 {
-    public (List<Vendor>?, long) GetPaginatedVendors(GetVendorsServiceRequest request)
+    public (List<Vendor>?, long) GetPaginatedVendors(GetVendorsPaginatedServiceRequest request)
     {
         var (paginatedVendors, count) = vendorReadRepository.GetPaged(request.PageSize!.Value, request.PageIndex!.Value, request.SortBy, request.SortOrder);
         return (paginatedVendors?.ToList(), count);
     }
 
-    public async Task<(List<Vendor>?, long)> GetPaginatedVendorsAsync(GetVendorsServiceRequest request)
+    public async Task<(List<Vendor>?, long)> GetPaginatedVendorsAsync(GetVendorsPaginatedServiceRequest request)
     {
         var (paginatedVendors, count) = await vendorReadRepository.GetPagedAsync(request.PageSize!.Value, request.PageIndex!.Value, request.SortBy, request.SortOrder);
         return (paginatedVendors?.ToList(), count);
     }
 
-    public (List<Vendor>?, long) GetAllVendors(GetVendorsServiceRequest request)
+    public (List<Vendor>?, long) GetAllVendors(GetVendorsPaginatedServiceRequest request)
     {
         var (paginatedVendors, count) = vendorReadRepository.GetAll(request.SortBy, request.SortOrder);
         return (paginatedVendors?.ToList(), count);
     }
 
-    public async Task<(List<Vendor>?, long)> GetAllVendorsAsync(GetVendorsServiceRequest request)
+    public async Task<(List<Vendor>?, long)> GetAllVendorsAsync(GetVendorsPaginatedServiceRequest request)
     {
         var (paginatedVendors, count) = await vendorReadRepository.GetAllAsync(request.SortBy, request.SortOrder);
         return (paginatedVendors?.ToList(), count);
@@ -138,6 +138,7 @@ public class VendorService(IReadableVendorRepository vendorReadRepository, ITend
         existingVendor.ModifiedDate = DateTime.UtcNow;
         existingVendor.ModifierUserId = userId;
         unitOfWork.WritableVendorRepository.Edit(existingVendor);
+        unitOfWork.SaveChanges();
         response.Data = existingVendor.Adapt<VendorServiceResponse>();
         response.IsSuccessfull = true;
         return response;
@@ -164,6 +165,7 @@ public class VendorService(IReadableVendorRepository vendorReadRepository, ITend
         existingVendor.ModifiedDate = DateTime.UtcNow;
         existingVendor.ModifierUserId = userId;
         unitOfWork.WritableVendorRepository.Delete(existingVendor);
+        unitOfWork.SaveChanges();
         response.IsSuccessfull = true;
         return response;
     }

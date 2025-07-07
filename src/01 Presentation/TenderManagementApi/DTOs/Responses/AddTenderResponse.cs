@@ -1,4 +1,5 @@
-﻿using TenderManagementDAL.Models;
+﻿using Microsoft.EntityFrameworkCore.Query;
+using TenderManagementDAL.Models.Abstarctions;
 
 namespace TenderManagementApi.DTOs.Responses
 {

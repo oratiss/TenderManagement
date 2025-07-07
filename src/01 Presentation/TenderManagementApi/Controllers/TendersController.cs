@@ -27,7 +27,7 @@ namespace TenderManagementApi.Controllers
             ApiResponse<GetAllTendersResponse> response = new();
             HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;
 
-            var (tenders, count) = tenderService.GetAllTenders(new GetTendersServiceRequest()
+            var (tenders, count) = tenderService.GetAllTenders(new GetTendersPaginatedServiceRequest()
             {
                 SortBy = "Id",
                 SortOrder = SortOrder.Asc

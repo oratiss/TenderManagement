@@ -5,10 +5,10 @@ namespace TenderManagementService.VendorServices
 {
     public interface IVendorService
     {
-        (List<Vendor>?, long) GetPaginatedVendors(GetVendorsServiceRequest request);
-        Task<(List<Vendor>?, long)> GetPaginatedVendorsAsync(GetVendorsServiceRequest request);
-        (List<Vendor>?, long) GetAllVendors(GetVendorsServiceRequest request);
-        Task<(List<Vendor>?, long)> GetAllVendorsAsync(GetVendorsServiceRequest request);
+        (List<Vendor>?, long) GetPaginatedVendors(GetVendorsPaginatedServiceRequest request);
+        Task<(List<Vendor>?, long)> GetPaginatedVendorsAsync(GetVendorsPaginatedServiceRequest request);
+        (List<Vendor>?, long) GetAllVendors(GetVendorsPaginatedServiceRequest request);
+        Task<(List<Vendor>?, long)> GetAllVendorsAsync(GetVendorsPaginatedServiceRequest request);
         Vendor? GetVendor(int id);
         Task<Vendor?> GetVendorAsync(int id);
         AddVendorServiceResponse AddVendor(AddVendorServiceRequest request);

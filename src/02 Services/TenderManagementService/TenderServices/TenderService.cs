@@ -9,25 +9,25 @@ namespace TenderManagementService.TenderServices
 {
     public class TenderService(IReadableTenderRepository tenderReadRepository, ITenderManagementUnitOfWork unitOfWork) : ITenderService
     {
-        public (List<Tender>?, long) GetPaginatedTenders(GetTendersServiceRequest request)
+        public (List<Tender>?, long) GetPaginatedTenders(GetTendersPaginatedServiceRequest request)
         {
             var (paginatedTenders, count) = tenderReadRepository.GetPaged(request.PageSize!.Value, request.PageIndex!.Value, request.SortBy, request.SortOrder);
             return (paginatedTenders?.ToList(), count);
         }
 
-        public async Task<(List<Tender>?, long)> GetPaginatedTendersAsync(GetTendersServiceRequest request)
+        public async Task<(List<Tender>?, long)> GetPaginatedTendersAsync(GetTendersPaginatedServiceRequest request)
         {
             var (paginatedTenders, count) = await tenderReadRepository.GetPagedAsync(request.PageSize!.Value, request.PageIndex!.Value, request.SortBy, request.SortOrder);
             return (paginatedTenders?.ToList(), count);
         }
 
-        public (List<Tender>?, long) GetAllTenders(GetTendersServiceRequest request)
+        public (List<Tender>?, long) GetAllTenders(GetTendersPaginatedServiceRequest request)
         {
             var (paginatedTenders, count) = tenderReadRepository.GetAll(request.SortBy, request.SortOrder);
             return (paginatedTenders?.ToList(), count);
         }
 
-        public async Task<(List<Tender>?, long)> GetAllTendersAsync(GetTendersServiceRequest request)
+        public async Task<(List<Tender>?, long)> GetAllTendersAsync(GetTendersPaginatedServiceRequest request)
         {
             var (paginatedTenders, count) = await tenderReadRepository.GetAllAsync(request.SortBy, request.SortOrder);
             return (paginatedTenders?.ToList(), count);
@@ -122,6 +122,7 @@ namespace TenderManagementService.TenderServices
             existingTender.ModifiedDate = DateTime.UtcNow;
             existingTender.ModifierUserId = userId;
             unitOfWork.WritableTenderRepository.Edit(existingTender);
+            unitOfWork.SaveChanges();
             response.Data = existingTender;
             response.IsSuccessfull = true;
             return response;
@@ -148,6 +149,7 @@ namespace TenderManagementService.TenderServices
             existingTender.ModifiedDate = DateTime.UtcNow;
             existingTender.ModifierUserId = userId;
             unitOfWork.WritableTenderRepository.Delete(existingTender);
+            unitOfWork.SaveChanges();
             response.IsSuccessfull = true;
             return response;
         }

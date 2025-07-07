@@ -4,7 +4,7 @@ using TenderManagementService.BidServices.Models;
 
 namespace TenderManagementService.VendorServices.Models;
 
-public class GetVendorsServiceRequest : IServiceRequest
+public class GetVendorsPaginatedServiceRequest : IPaginatedServiceRequest
 {
     public int? PageIndex { get; set; }
     public int? PageSize { get; set; }

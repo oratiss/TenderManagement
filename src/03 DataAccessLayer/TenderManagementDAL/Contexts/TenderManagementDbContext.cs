@@ -33,13 +33,17 @@ namespace TenderManagementDAL.Contexts
 
             builder.Entity<Tender>().Property<string>("Title").HasMaxLength(70);
             builder.Entity<Tender>().Property<string>("Description").HasMaxLength(1000);
-            builder.Entity<Tender>().Property<string>("ModifierUserId").HasMaxLength(36);
+            builder.Entity<Tender>().Property<string>("ModifierUserId").HasMaxLength(36); //string Guid
+            
+            builder.Entity<Category>().Property<string>("Name").HasMaxLength(100);
 
             builder.Entity<Vendor>().Property<string>("Title").HasMaxLength(100);
             builder.Entity<Vendor>().Property<string>("Description").HasMaxLength(500);
             builder.Entity<Vendor>().Property<string>("ModifierUserId").HasMaxLength(36);
 
-            builder.Entity<Category>().Property<string>("Name").HasMaxLength(100);
+            builder.Entity<Bid>().Property<string>("Comment").HasMaxLength(1000);
+            builder.Entity<Bid>().Property<string>("ModifierUserId").HasMaxLength(36); //string Guid
+
 
 
 

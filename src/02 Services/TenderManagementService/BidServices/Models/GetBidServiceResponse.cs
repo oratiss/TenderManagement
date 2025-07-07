@@ -4,15 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TenderManagementDAL.Models;
+using TenderManagementService.AbstractModels;
 
 namespace TenderManagementService.BidServices.Models
 {
-    public class GetBidServiceResponse
+    public class GetBidServiceResponse : IServiceResponse<BidServiceResponse>
     {
-        public long Id { get; set; }
-        public decimal Amount { get; set; }
-        public DateTime SubmissionDateTime { get; set; }
-        public int StatusId { get; set; }
-        public string Status { get; set; } = null!;
+        public BidServiceResponse? Data { get; set; }
+        public List<ServiceError>? Errors { get; set; }
+        public ServicePaginationMetaData? PaginationMetaData { get; set; }
+        public bool IsSuccessfull { get; set; }
     }
 }
